@@ -2,9 +2,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Film, Sparkles } from "lucide-react";
 
+type Movie = {
+  id: string;
+  title: string;
+  escolhidoPor: string;
+};
+
 interface MovieRouletteProps {
-  movies: string[];
-  onMovieSelected: (movie: string) => void;
+  movies: Movie[];
+  onMovieSelected: (movie: Movie) => void;
 }
 
 export const MovieRoulette = ({ movies, onMovieSelected }: MovieRouletteProps) => {
@@ -50,7 +56,7 @@ export const MovieRoulette = ({ movies, onMovieSelected }: MovieRouletteProps) =
               <>
                 <Film className={`w-12 h-12 mx-auto mb-4 text-primary ${isSpinning ? "animate-spin" : ""}`} />
                 <p className={`text-xl md:text-2xl font-bold text-primary transition-all ${isSpinning ? "blur-sm" : ""}`}>
-                  {movies[currentIndex]}
+                  {movies[currentIndex]?.escolhidoPor}
                 </p>
               </>
             ) : (
