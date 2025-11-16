@@ -5,8 +5,14 @@ import { Card } from "@/components/ui/card";
 import { Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
+type Movie = {
+  id: string;
+  title: string;
+  escolhidoPor: string;
+};
+
 interface MovieInputProps {
-  movies: string[];
+  movies: Movie[];
   onAddMovie: (movie: string) => void;
   onRemoveMovie: (index: number) => void;
 }
@@ -55,10 +61,10 @@ export const MovieInput = ({ movies, onAddMovie, onRemoveMovie }: MovieInputProp
             <div className="max-h-48 overflow-y-auto space-y-2">
               {movies.map((movie, index) => (
                 <div
-                  key={index}
+                  key={movie.id}
                   className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border hover:border-primary transition-colors"
                 >
-                  <span className="text-foreground">{movie}</span>
+                  <span className="text-foreground">{movie.escolhidoPor}</span>
                   <Button
                     variant="ghost"
                     size="sm"
