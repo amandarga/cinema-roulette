@@ -106,8 +106,13 @@ app.get("/api/movies", async (req, res) => {
 });
 
 // 2) Atualizar um filme para Status = "Assistindo"
-app.post("/api/movies/:id/start", async (req, res) => {
-  const pageId = req.params.id;
+app.post("/api/start", async (req, res) => {
+  const pageId = req.query.id;
+
+  if (!pageId) {
+    res.status(400).json({ error: "ID do filme não fornecido" });
+    return;
+  }
 
   try {
     await notion.pages.update({

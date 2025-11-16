@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { MovieRoulette } from "@/components/MovieRoulette";
-import { MovieInput } from "@/components/MovieInput";
 import { WinnerDisplay } from "@/components/WinnerDisplay";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Card } from "@/components/ui/card";
 import { Film } from "lucide-react";
 import { toast } from "sonner";
 
@@ -40,21 +40,6 @@ const Index = () => {
 
     fetchMovies();
   }, []);
-
-  const handleAddMovie = (movie: string) => {
-    // Por enquanto, adicionar manualmente ainda funciona (opcional)
-    const newMovie: Movie = {
-      id: `local-${Date.now()}`,
-      title: movie,
-      escolhidoPor: "Manual",
-    };
-    setMovies([...movies, newMovie]);
-    setWinner(null);
-  };
-
-  const handleRemoveMovie = (index: number) => {
-    setMovies(movies.filter((_, i) => i !== index));
-  };
 
   const handleMovieSelected = async (movie: Movie) => {
     setWinner(movie);
@@ -114,11 +99,36 @@ const Index = () => {
                 Monte sua lista de filmes favoritos
               </p>
             </div>
-            <MovieInput
-              movies={movies}
-              onAddMovie={handleAddMovie}
-              onRemoveMovie={handleRemoveMovie}
-            />
+            {/* Lista de pessoas (somente leitura) */}
+            <Card className="bg-card p-6 shadow-deep border-primary/20">
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-primary mb-2">Filmes para Sortear</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Carregados automaticamente do Notion
+                  </p>
+                </div>
+                {isLoading ? (
+                  <p className="text-muted-foreground text-center py-4">Carregando filmes...</p>
+                ) : movies.length > 0 ? (
+                  <div className="space-y-2">
+                    {movies.map((movie) => (
+                      <div
+                        key={movie.id}
+                        className="flex items-center gap-3 p-3 bg-muted rounded-lg border border-border"
+                      >
+                        <Film className="w-4 h-4 text-primary" />
+                        <span className="text-foreground font-medium">{movie.escolhidoPor}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-4">
+                    Nenhum filme com status "Assistir" encontrado no Notion
+                  </p>
+                )}
+              </div>
+            </Card>
           </div>
 
           {/* Right column - Roulette */}
@@ -138,6 +148,7 @@ const Index = () => {
         {/* Winner display como modal */}
         <Dialog open={!!winner} onOpenChange={(open) => !open && setWinner(null)}>
           <DialogContent className="max-w-2xl border-none bg-transparent shadow-none p-0">
+            <DialogTitle className="sr-only">Filme Sorteado</DialogTitle>
             <WinnerDisplay winner={winner} />
           </DialogContent>
         </Dialog>
