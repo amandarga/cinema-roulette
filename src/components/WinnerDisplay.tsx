@@ -1,8 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Trophy, Sparkles } from "lucide-react";
 
+type Movie = {
+  id: string;
+  title: string;
+  escolhidoPor: string;
+};
+
 interface WinnerDisplayProps {
-  winner: string | null;
+  winner: Movie | null;
 }
 
 export const WinnerDisplay = ({ winner }: WinnerDisplayProps) => {
@@ -25,8 +31,11 @@ export const WinnerDisplay = ({ winner }: WinnerDisplayProps) => {
             🎬 Filme Sorteado 🎬
           </p>
           <h2 className="text-4xl md:text-5xl font-bold text-primary-foreground drop-shadow-lg">
-            {winner}
+            {winner.title}
           </h2>
+          <p className="text-lg text-primary-foreground/70 mt-3">
+            Escolhido por: <span className="font-semibold">{winner.escolhidoPor}</span>
+          </p>
         </div>
 
         <div className="flex items-center justify-center gap-1 pt-4">
