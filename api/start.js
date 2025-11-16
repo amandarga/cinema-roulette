@@ -1,6 +1,6 @@
-const { Client } = require("@notionhq/client");
+import { Client } from "@notionhq/client";
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // Configurar CORS
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -38,7 +38,11 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Erro ao atualizar status no Notion:", error);
-    res.status(500).json({ error: "Erro ao atualizar status" });
+    console.error("❌ Erro ao atualizar status:", error);
+    console.error("Stack:", error.stack);
+    res.status(500).json({ 
+      error: "Erro ao atualizar status",
+      message: error.message
+    });
   }
-};
+}

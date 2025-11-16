@@ -1,6 +1,6 @@
-const { Client } = require("@notionhq/client");
+import { Client } from "@notionhq/client";
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // Configurar CORS
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -16,6 +16,27 @@ module.exports = async (req, res) => {
   }
 
   try {
+    // Validar variáveis de ambiente
+    if (!process.env.NOTION_API_KEY) {
+      console.error("❌ NOTION_API_KEY não encontrada");
+      return res.status(500).json({ 
+        error: "NOTION_API_KEY não configurada",
+        hint: "Adicione a variável de ambiente na Vercel" 
+      });
+    }
+
+    if (!process.env.NOTION_DATABASE_ID) {
+      console.error("❌ NOTION_DATABASE_ID não encontrada");
+      return res.status(500).json({ 
+        error: "NOTION_DATABASE_ID não configurada",
+        hint: "Adicione a variável de ambiente na Vercel" 
+      });
+    }
+
+    console.log("✅ Variáveis encontradas");
+    console.log(`   API_KEY: ${process.env.NOTION_API_KEY.substring(0, 10)}...`);
+    console.log(`   DB_ID: ${process.env.NOTION_DATABASE_ID.substring(0, 10)}...`);
+
     const notion = new Client({ auth: process.env.NOTION_API_KEY });
     const databaseId = process.env.NOTION_DATABASE_ID;
 
@@ -45,9 +66,15 @@ module.exports = async (req, res) => {
       })
       .filter((m) => m.title && m.title.trim().length > 0);
 
+    console.log(`📊 ${movies.length} filmes encontrados`);
     res.status(200).json(movies);
   } catch (error) {
-    console.error("Erro ao buscar filmes no Notion:", error);
-    res.status(500).json({ error: "Erro ao buscar filmes" });
+    console.error("❌ Erro ao buscar filmes:", error);
+    console.error("Stack:", error.stack);
+    res.status(500).json({ 
+      error: "Erro ao buscar filmes",
+      message: error.message,
+      stack: error.stack
+    });
   }
-};
+}
