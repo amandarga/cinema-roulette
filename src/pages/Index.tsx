@@ -1,16 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MovieRoulette } from "@/components/MovieRoulette";
 import { MovieInput } from "@/components/MovieInput";
 import { WinnerDisplay } from "@/components/WinnerDisplay";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Film } from "lucide-react";
+import { toast } from "sonner";
+
+type Movie = {
+  id: string;
+  title: string;
+  escolhidoPor: string;
+};
 
 const Index = () => {
-  const [movies, setMovies] = useState<string[]>([]);
-  const [winner, setWinner] = useState<string | null>(null);
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [winner, setWinner] = useState<Movie | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Carregar filmes do backend ao montar o componente
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/api/movies");
+        if (!res.ok) throw new Error("Erro ao carregar filmes");
+        const data: Movie[] = await res.json();
+        setMovies(data);
+      } catch (error) {
+        console.error("Erro ao carregar filmes do Notion:", error);
+        toast.error("Erro ao carregar filmes do Notion");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, []);
 
   const handleAddMovie = (movie: string) => {
-    setMovies([...movies, movie]);
+    // Por enquanto, adicionar manualmente ainda funciona (opcional)
+    const newMovie: Movie = {
+      id: `local-${Date.now()}`,
+      title: movie,
+      escolhidoPor: "Manual",
+    };
+    setMovies([...movies, newMovie]);
     setWinner(null);
   };
 
@@ -18,8 +51,21 @@ const Index = () => {
     setMovies(movies.filter((_, i) => i !== index));
   };
 
-  const handleMovieSelected = (movie: string) => {
+  const handleMovieSelected = async (movie: Movie) => {
     setWinner(movie);
+
+    // Atualizar status no Notion
+    try {
+      const res = await fetch(`http://localhost:4000/api/movies/${movie.id}/start`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Erro ao atualizar status");
+      console.log(`✅ Status do filme "${movie.title}" atualizado para Assistindo no Notion`);
+      toast.success(`Filme "${movie.title}" marcado como Assistindo no Notion!`);
+    } catch (error) {
+      console.error("Erro ao atualizar status no Notion:", error);
+      toast.error("Erro ao atualizar status no Notion");
+    }
   };
 
   return (
