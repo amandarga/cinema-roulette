@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
       properties: {
         Status: {
           status: {
-            name: "🧡Assistindo",
+            name: "Assistindo",
           },
         },
       },
