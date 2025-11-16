@@ -12,6 +12,11 @@ type Movie = {
   escolhidoPor: string;
 };
 
+// URL base da API (localhost em dev, /api em produção)
+const API_BASE_URL = import.meta.env.DEV 
+  ? "http://localhost:4000/api" 
+  : "/api";
+
 const Index = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [winner, setWinner] = useState<Movie | null>(null);
@@ -21,7 +26,7 @@ const Index = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/movies");
+        const res = await fetch(`${API_BASE_URL}/movies`);
         if (!res.ok) throw new Error("Erro ao carregar filmes");
         const data: Movie[] = await res.json();
         setMovies(data);
@@ -56,7 +61,7 @@ const Index = () => {
 
     // Atualizar status no Notion
     try {
-      const res = await fetch(`http://localhost:4000/api/movies/${movie.id}/start`, {
+      const res = await fetch(`${API_BASE_URL}/start?id=${movie.id}`, {
         method: "POST",
       });
       if (!res.ok) throw new Error("Erro ao atualizar status");
